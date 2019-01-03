@@ -26,6 +26,14 @@ class MoodleDB():
             user=user, host=host, password=password, **kwargs)
         self.cur: Cursor = self.conn.cursor()
 
+    def close(self):
+        self.conn.commit()
+        self.close_no_save()
+
+    def close_no_save(self):
+        self.cur.close()
+        self.conn.close()
+
     def get_course_list(self) -> [dict, ]:
         """ Get list of courses
 
@@ -61,14 +69,6 @@ class MoodleDB():
 
     def get_instanceid_to_username_map(self):
         pass
-
-    def close(self):
-        self.conn.commit()
-        self.close_no_save()
-
-    def close_no_save(self):
-        self.cur.close()
-        self.conn.close()
 
     def _get_fileds_from_table(self, from_: str, where: str = None, by: str = None, *args) -> [dict, ]:
         """ Get data from a table
