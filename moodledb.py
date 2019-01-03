@@ -36,8 +36,16 @@ class MoodleDB():
         return self._get_fileds_from_table('mdl_course', None, None, 'id',
                                            'fullname', 'shortname', 'summary')
 
-    def get_assignments_list(self, courseid: int):
-        pass
+    def get_assignments_list(self, courseid: int) -> [dict, ]:
+        """ Get the list of assignments in a course
+
+        Arguments:
+            courseid {int} -- The ID of the course
+
+        Returns:
+            [dict, ] -- a list of dicts containing `id` and `name` of the assignment
+        """
+        return self._get_fileds_from_table('mdl_assign', 'course', courseid, 'id', 'name')
 
     def get_user_info(self, userid: int) -> dict:
         """ Get the user's info, name, surname and email
