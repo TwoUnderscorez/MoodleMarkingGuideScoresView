@@ -26,8 +26,15 @@ class MoodleDB():
             user=user, host=host, password=password, **kwargs)
         self.cur: Cursor = self.conn.cursor()
 
-    def get_course_list(self):
-        pass
+    def get_course_list(self) -> [dict, ]:
+        """ Get list of courses
+
+        Returns:
+            [dict, ] -- A list of dictionaries with `id`, `fullname`, 
+                        `shortname` and `summary` of the course
+        """
+        return self._get_fileds_from_table('mdl_course', None, None, 'id',
+                                           'fullname', 'shortname', 'summary')
 
     def get_assignments_list(self, courseid: int):
         pass
