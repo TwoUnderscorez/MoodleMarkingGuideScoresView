@@ -55,13 +55,26 @@ class MoodleDB():
         self.cur.close()
         self.conn.close()
 
-    def _get_fileds_from_table(self, from_: str, where: str = None, by: str = None, *args) -> dict:
-        self.cur.execute(
-            f"SELECT {str.join('',(f'{f},' for f in args))[:-1]} FROM {self.db}.{from_} "
-            f"WHERE {where}={by};" if where else ';'
+    def _get_fileds_from_table(self, from_: str, where: str = None, by: str = None, *args) -> [dict, ]:
+        """ Get data from a table
+
+        Arguments:
+            from_ {str} -- From which table
+
+        Keyword Arguments:
+            where {str} -- Column name of where clause (default: {None})
+            by {str} -- Value of where clause (default: {None})
+
+        Variable Positional Arguments:
+            args {[str,]} -- the culumns to select
+
+        Returns:
+            [dict, ] -- A list of dicts containing the result `column`:`value`
+        """
+        sqlq: str = (
+            (f"SELECT {str.join('',(f'{f},' for f in args))[:-1]} FROM {self.db}.{from_} ") +
+            (f"WHERE {where}={by};" if where else ';')
         )
+        self.cur.execute(sqlq)
         res = self.cur.fetchall()
-        if where:
-            return dict(zip(args, res[0]))
-        else:
-            raise NotImplementedError("Can't return a list of objects yet.")
+        return [dict(zip(args, r)) for r in res]
