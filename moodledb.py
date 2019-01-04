@@ -117,7 +117,19 @@ class MoodleDB():
             )
         return int(res[0]['areaid'])
 
-    def get_criteria_names(self, areaid):
+    def get_criteria_names(self, areaid: int) -> [dict, ]:
+        """ Get the criteria text of an assignment
+
+        Arguments:
+            areaid {int} -- The areaid of the assignment
+
+        Returns:
+            [dict, ] -- A list of dicts containing `id`, `definitionid`, 
+                        `shortname` and `maxscore` fields of a criterion
+
+        Note:
+            Always use `MoodleDB.get_assignment_areaid` to get the areaid
+        """
         return self._get_fileds_from_table('mdl_gradingform_guide_criteria', 'definitionid',
                                            areaid, 'id', 'definitionid', 'shortname', 'maxscore')
 
