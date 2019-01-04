@@ -62,11 +62,19 @@ class MoodleDB():
         Arguments:
             userid {int} -- The user's ID in to moodle database
 
+        Raises:
+            KeyError -- If there is no such user with the given id
+
         Returns:
             dict -- a dictionary containing `id`, `name`, `surname`
                     and `email` fields
         """
-        return self._get_fileds_from_table('mdl_user', 'id', userid, 'id', 'firstname', 'lastname', 'email')
+        res = self._get_fileds_from_table(
+            'mdl_user', 'id', userid, 'id', 'firstname', 'lastname', 'email')
+        if len(res) == 0:
+            raise KeyError(
+                f'No such user with id of {id} in {self.db}.mdl_user')
+        return res[0]
 
     def _get_fileds_from_table(self, from_: str, where: str = None, by: str = None, *args) -> [dict, ]:
         """ Get data from a table
