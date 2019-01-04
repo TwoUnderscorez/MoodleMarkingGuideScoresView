@@ -1,5 +1,6 @@
 """ Connection to the Moodle database
 """
+import warnings
 import pymysql as sql
 from pymysql.connections import Connection
 from pymysql.cursors import Cursor
@@ -67,9 +68,6 @@ class MoodleDB():
         """
         return self._get_fileds_from_table('mdl_user', 'id', userid, 'id', 'firstname', 'lastname', 'email')
 
-    def get_instanceid_to_username_map(self):
-        pass
-
     def _get_fileds_from_table(self, from_: str, where: str = None, by: str = None, *args) -> [dict, ]:
         """ Get data from a table
 
@@ -93,3 +91,35 @@ class MoodleDB():
         self.cur.execute(sqlq)
         res = self.cur.fetchall()
         return [dict(zip(args, r)) for r in res]
+
+    def get_assignment_areaid(self, id: int) -> int:
+        """ Get the areaid of an assignment for the mdl_gradingform_guide_criteria table
+
+        Arguments:
+            id {int} -- The id of the assignment in mdl_assign
+
+        Raises:
+            KeyError -- If there is no such assignment with the given id
+
+        Returns:
+            int -- The areaid of the assignment
+        """
+        res = self._get_fileds_from_table(
+            'mdl_grading_definitions', 'id', id, 'areaid')
+        if len(res) == 0:
+            raise KeyError(
+                f'No such assignment with id of {id} in {self.db}.mdl_grading_definitions')
+        elif len(res) > 1:
+            warnings.warn(
+                f'There should be only one assignment with id of {id} in {self.db}.mdl_grading_definitions but {len(res)} matches were found. Using the first one.',
+                RuntimeWarning,
+                stacklevel=2
+            )
+        return int(res[0]['areaid'])
+
+    def get_criteria_names(self, areaid):
+        return self._get_fileds_from_table('mdl_gradingform_guide_criteria', 'definitionid',
+                                           areaid, 'id', 'definitionid', 'shortname', 'maxscore')
+
+    def get_instanceid_to_username_map(self):
+        pass
