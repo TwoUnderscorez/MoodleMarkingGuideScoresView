@@ -155,12 +155,25 @@ class MoodleDB():
                                           and `score` of a students data on a spesific
                                           criterion
         """
-
         retdata = {}
         for cid in criteria_ids:
             retdata[cid] = self._get_fileds_from_table('mdl_gradingform_guide_fillings',
                                                        'criterionid', cid, 'id', 'instanceid', 'criterionid', 'remark', 'score')
         return retdata
 
-    def get_instanceid_to_username_map(self):
-        pass
+    def instanceid_to_userid(self, instanceid: int) -> int:
+        """ Gets the userid from an instanceid
+
+        Arguments:
+            instanceid {int} -- The instanceid
+
+        Returns:
+            int -- The userid
+        """
+
+        res = self._get_fileds_from_table(
+            'mdl_grading_instances', 'id', instanceid, 'itemid')
+        itemid: int = res[0]['itemid']
+        res = self._get_fileds_from_table(
+            'mdl_assign_grades', 'id', itemid, 'userid')
+        return res[0]['userid']

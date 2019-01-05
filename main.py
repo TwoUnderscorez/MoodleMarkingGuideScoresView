@@ -12,6 +12,7 @@ def main():
     cr = db.get_criteria_names(defid)
     cids = [a['id'] for a in cr]
     assign_info = db.get_grading_info(cids)
+    userid = db.instanceid_to_userid(49)
     db.close_no_save()
 
 
