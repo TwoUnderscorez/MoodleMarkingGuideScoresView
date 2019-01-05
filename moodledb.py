@@ -141,5 +141,8 @@ class MoodleDB():
         return self._get_fileds_from_table('mdl_gradingform_guide_criteria', 'definitionid',
                                            areaid, 'id', 'definitionid', 'shortname', 'maxscore')
 
+    def get_grading_info(self, criteria_ids: [int, ]) -> [dict, ]:
+        pass
+
     def get_instanceid_to_username_map(self):
         pass
