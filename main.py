@@ -8,10 +8,10 @@ def main():
 
     db = moodledb.MoodleDB(config.MYSQL_USER, config.MYSQL_PASSWORD,
                            config.MYSQL_HOST, config.MYSQL_DB, port=config.MYSQL_PORT)
-    ron = db.get_user_info(3)
-    areaid = db.get_assignment_areaid(14)
-    cr = db.get_criteria_names(areaid)
-    ids = [a['id'] for a in cr]
+    defid = db.get_assignment_definitionid(25)
+    cr = db.get_criteria_names(defid)
+    cids = [a['id'] for a in cr]
+    assign_info = db.get_grading_info(cids)
     db.close_no_save()
 
 

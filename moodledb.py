@@ -101,20 +101,20 @@ class MoodleDB():
         res = self.cur.fetchall()
         return [dict(zip(args, r)) for r in res]
 
-    def get_assignment_areaid(self, id: int) -> int:
-        """ Get the areaid of an assignment for the mdl_gradingform_guide_criteria table
+    def get_assignment_definitionid(self, areaid: int) -> int:
+        """ Get the definitionid of an assignment for the mdl_gradingform_guide_criteria table
 
         Arguments:
-            id {int} -- The id of the assignment in mdl_assign
+            areaid {int} -- The id of the assignment in mdl_assign
 
         Raises:
             KeyError -- If there is no such assignment with the given id
 
         Returns:
-            int -- The areaid of the assignment
+            int -- The definitionid of the assignment
         """
         res = self._get_fileds_from_table(
-            'mdl_grading_definitions', 'id', id, 'areaid')
+            'mdl_grading_definitions', 'areaid', areaid, 'id')
         if len(res) == 0:
             raise KeyError(
                 f'No such assignment with id of {id} in {self.db}.mdl_grading_definitions')
@@ -124,26 +124,43 @@ class MoodleDB():
                 RuntimeWarning,
                 stacklevel=2
             )
-        return int(res[0]['areaid'])
+        return int(res[0]['id'])
 
-    def get_criteria_names(self, areaid: int) -> List[dict]:
+    def get_criteria_names(self, definitionid: int) -> List[dict]:
         """ Get the criteria text of an assignment
 
         Arguments:
-            areaid {int} -- The areaid of the assignment
+            definitionid {int} -- The definitionid of the assignment
 
         Returns:
             List[dict] -- A list of dicts containing `id`, `definitionid`, 
                           `shortname` and `maxscore` fields of a criterion
 
         Note:
-            Always use `MoodleDB.get_assignment_areaid` to get the areaid
+            Always use `MoodleDB.get_assignment_definitionid` to get the definitionid
         """
         return self._get_fileds_from_table('mdl_gradingform_guide_criteria', 'definitionid',
-                                           areaid, 'id', 'definitionid', 'shortname', 'maxscore')
+                                           definitionid, 'id', 'definitionid', 'shortname', 'maxscore')
 
-    def get_grading_info(self, criteria_ids: List[int]) -> List[dict]:
-        pass
+    def get_grading_info(self, criteria_ids: List[int]) -> List[List[Dict[str, str]]]:
+        """ Get each student's score for all the criteria
+
+        Arguments:
+            criteria_ids {List[int]} -- The criteria IDs that represent
+                                        the assignment
+
+        Returns:
+            List[List[Dict[str, str]]] -- List[criterion][students][instanceid, str]
+                                          where the str there represents the `remark`
+                                          and `score` of a students data on a spesific
+                                          criterion
+        """
+
+        retdata = {}
+        for cid in criteria_ids:
+            retdata[cid] = self._get_fileds_from_table('mdl_gradingform_guide_fillings',
+                                                       'criterionid', cid, 'id', 'instanceid', 'criterionid', 'remark', 'score')
+        return retdata
 
     def get_instanceid_to_username_map(self):
         pass
