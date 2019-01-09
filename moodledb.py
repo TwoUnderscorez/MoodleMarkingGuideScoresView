@@ -142,7 +142,7 @@ class MoodleDB():
         return self._get_fileds_from_table('mdl_gradingform_guide_criteria', 'definitionid',
                                            definitionid, 'id', 'definitionid', 'shortname', 'maxscore')
 
-    def get_grading_info(self, criteria_ids: List[int]) -> List[List[Dict[str, str]]]:
+    def get_grading_info(self, criteria_ids: List[int]) -> Dict[int, List[Dict[str, object]]]:
         """ Get each student's score for all the criteria
 
         Arguments:
@@ -150,10 +150,10 @@ class MoodleDB():
                                         the assignment
 
         Returns:
-            List[List[Dict[str, str]]] -- List[criterion][students][instanceid, str]
-                                          where the str there represents the `remark`
-                                          and `score` of a students data on a spesific
-                                          criterion
+            Dict[int, List[Dict[str, object]]] -- 
+                Dict[criterionid, criterion][students][criterion specifit to instanceid]
+                where the str there represents the `remark` and `score` of a students
+                data on a spesific criterion
         """
         retdata = {}
         for cid in criteria_ids:
