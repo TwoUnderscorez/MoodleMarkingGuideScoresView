@@ -5,17 +5,13 @@ import config
 
 
 def main():
-    db = moodledb.MoodleDB(config.MYSQL_USER, config.MYSQL_PASSWORD,
-                           config.MYSQL_HOST, config.MYSQL_DB, port=config.MYSQL_PORT)
-    defid = db.get_assignment_definitionid(25)
-    crs = db.get_criteria_names(defid)
-    cids = [cr['id'] for cr in crs]
-    assign_info = db.get_grading_info(cids)
-    userid = db.instanceid_to_userid(49)
-    db.close_no_save()
+    res = get_data_from_moodledb()
+    usr = get_user_data(res)
+    print('Done')
 
 
 def get_data_from_moodledb():
+    retdata = {}
     db = moodledb.MoodleDB(config.MYSQL_USER, config.MYSQL_PASSWORD,
                            config.MYSQL_HOST, config.MYSQL_DB, port=config.MYSQL_PORT)
     courses = db.get_course_list()
@@ -26,8 +22,24 @@ def get_data_from_moodledb():
     crs = db.get_criteria_names(defid)
     cids = [cr['id'] for cr in crs]
     assign_info = db.get_grading_info(cids)
-    userid = db.instanceid_to_userid(49)
+    for crid, crdataarr in assign_info.items():
+        retdata[crid] = {}
+        for crdata in crdataarr:
+            retdata[crid][db.instanceid_to_userid(
+                crdata['instanceid'])] = crdata
     db.close_no_save()
+    return retdata
+
+
+def get_user_data(assign_info):
+    retdata = {}
+    db = moodledb.MoodleDB(config.MYSQL_USER, config.MYSQL_PASSWORD,
+                           config.MYSQL_HOST, config.MYSQL_DB, port=config.MYSQL_PORT)
+    for crid, crdata in assign_info.items():
+        for userid in crdata:
+            retdata[userid] = db.get_user_info(userid)
+        break
+    return retdata
 
 
 if __name__ == "__main__":
